@@ -35,6 +35,15 @@ factors.tb <- factors.fun(data.tb, ranking_period.v, num_leg_positions.v) %>% mu
 
 
 
+
+
+
+# futures.tb <- readRDS(file = "data/Futures.Rds"); tickers.tb <- readRDS(file = "data/Tickers.Rds")
+aggregate_CHP.tb <- aggregate_CHP.fun(futures.tb, tickers.tb) %>% filter(!is.na(CHP)) %>% filter(Asset_pool == "US-Commodity") %>% 
+  mutate(`State variable` = CHP) %>% select(Date, `State variable`)
+
+
+
 futures_rets.tb <- futures.tb %>% left_join(tickers.tb %>% select(Active_ticker, Market, Asset_class, Country), by = "Active_ticker") %>% 
   filter(Market == TRUE, Asset_class == "Commodity") %>% group_by(Country, Date) %>% summarise(Return = mean(Front_return, na.rm = TRUE)) %>%
   mutate(Name = ifelse(Country == "UK", paste0("EW - ", Country, "-Metals"), paste0("EW - ", Country, "-Commodities"))) %>% ungroup %>% select(-Country) %>% 
@@ -44,13 +53,13 @@ factor_rets.tb <- factors.tb %>% filter(Name %in% c("CHP", "Momentum")) %>% sele
   filter(row_number() == 1L) %>% ungroup %>% mutate(Long = Return.long, Short = Return.short) %>% select(Name, Date, Long, Short) %>%
   gather(Leg, Return, -c(Name, Date)) %>% mutate(Name = paste0(Name, " factor - ", Leg)) %>% select(Name, Date, Return)
 
-data.tb <- rbind(futures_rets.tb, factor_rets.tb) %>% spread(key = Name, value = Return)
+data.tb <- rbind(futures_rets.tb, factor_rets.tb) %>% spread(key = Name, value = Return) %>% full_join(aggregate_CHP.tb, by = "Date")
 
 SP.tb <- futures.tb %>% filter(Active_ticker == "SPA Comdty") %>% mutate("SP500-Return" = Front_return, "SP500-CHP" = CHP) %>% 
   select(Date, `SP500-Return`, `SP500-CHP`)
 
 data.tb %>% full_join(SP.tb, by = "Date") %>% 
   select(Date, `CHP factor - Long`, `CHP factor - Short`, `Momentum factor - Long`, `Momentum factor - Short`, 
-         `EW - UK-Metals`, `EW - US-Commodities`, `SP500-Return`, `SP500-CHP`) %>% 
+         `EW - UK-Metals`, `EW - US-Commodities`, `State variable`, `SP500-Return`, `SP500-CHP`) %>% 
   write.csv(file = "TDA.csv")
 

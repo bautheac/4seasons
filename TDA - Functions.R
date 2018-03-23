@@ -184,3 +184,25 @@ mrkt_factor.fun <- function(data.tb, name.v){
     mutate(Positions.short = NA, Return.short = NA)
 }
 
+
+
+
+aggregate_CHP.fun <- function(futures.tb, tickers.tb){
+  
+  country.tb <- futures.tb %>% left_join(tickers.tb %>% select(Active_ticker, Asset_class, Country), by = "Active_ticker") %>%
+    group_by(Asset_class, Country, Date) %>% summarise(CHP = mean(CHP, na.rm = T)) %>% group_by(Asset_class, Country) %>% 
+    mutate(CHP_regime = ifelse(CHP < median(CHP, na.rm = T), "Backwardation", "Contango")) %>% ungroup %>% arrange(Asset_class, desc(Country)) %>%
+    mutate(Asset_pool = paste(Country, Asset_class, sep = "-")) %>% select(Asset_pool, Date, CHP, CHP_regime)
+  
+  coutry_sector.tb <- futures.tb %>% left_join(tickers.tb %>% select(Active_ticker, Asset_class, Sector, Country), by = "Active_ticker") %>%
+    group_by(Asset_class, Country, Sector, Date) %>% summarise(CHP = mean(CHP, na.rm = T)) %>% group_by(Asset_class, Country, Sector) %>% 
+    mutate(CHP_regime = ifelse(CHP < median(CHP, na.rm = T), "Backwardation", "Contango")) %>% ungroup %>% arrange(Asset_class, desc(Country), Sector) %>%
+    mutate(Asset_pool = paste(Country, Asset_class, Sector, sep = "-")) %>% select(Asset_pool, Date, CHP, CHP_regime)
+  
+  coutry_sector_subsector.tb <- futures.tb %>% left_join(tickers.tb %>% select(Active_ticker, Asset_class, Sector, Subsector, Country), by = "Active_ticker") %>%
+    group_by(Asset_class, Country, Sector, Subsector, Date) %>% summarise(CHP = mean(CHP, na.rm = T)) %>% group_by(Asset_class, Country, Sector, Subsector) %>% 
+    mutate(CHP_regime = ifelse(CHP < median(CHP, na.rm = T), "Backwardation", "Contango")) %>% ungroup %>% arrange(Asset_class, desc(Country), Sector, Subsector) %>%
+    mutate(Asset_pool = paste(Country, Asset_class, Sector, Subsector, sep = "-")) %>% select(Asset_pool, Date, CHP, CHP_regime)
+  
+  list(country.tb, coutry_sector.tb, coutry_sector_subsector.tb) %>% do.call(what = "rbind", args = .)
+}
