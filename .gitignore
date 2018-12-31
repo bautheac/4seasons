@@ -1,2 +1,6 @@
 packrat/lib*/
 .Rproj.user
+data/
+packrat/
+results/
+scripts/
