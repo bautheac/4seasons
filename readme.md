@@ -3,13 +3,13 @@ The four seasons of commodity futures
 Olivier
 2018-12-31
 
-## Correlations matrices
+## Correlation matrices
 
 Hi Pawel, no file size exceeds 6gb which I thought would be ok as most
 notebooks run with RAM \>= 8gb nowadays. One solution is to read
 sequetially, only loading one chunk of a particular file at a time in
 memory. The matrices are 24x24 (24 commodities) so ideally you would
-choose chunk size = 24x. Each file is organised as follow:
+choose chunk size = 24x rows. Each file is organised as follow:
 
     ## # A tibble: 24 x 29
     ##    variable periods subperiods subperiod ticker `BOA Comdty` `C A Comdty`
