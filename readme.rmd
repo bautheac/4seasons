@@ -1,0 +1,32 @@
+---
+title: "The four seasons of commodity futures"
+author: "Olivier"
+date: "`r Sys.Date()`"
+
+output: html_document
+---
+
+```{r setup, include = FALSE}
+library(magrittr)
+
+knitr::opts_chunk$set(warning = F, message = F, echo = F)
+```
+
+## Correlations matrices
+
+Hi Pawel, no file size exceeds 6gb which I thought would be ok as most notebooks run with RAM >= 8gb nowadays. One solution is to read sequetially, only loading one chunk of a particular file at a time in memory. The matrices are 24x24 (24 commodities) so ideally you would choose chunk size = 24x. Each file is organised as follow:  
+
+```{r correlations}
+
+readr::read_csv(file = "results/correlations/1-year chunks - CHP.csv", n_max = 24L) %>% 
+  kableExtra::kable() %>% kableExtra::kable_styling() %>%
+  kableExtra::scroll_box(width = "100%", height = "400px")
+```
+
+  
+  
+Another solution, not incompatible with the one above actually, would be to explain me in plain english what you do with each matrix so I could perform the task myself which I would happily do. Meanwhile you could focus on the other part of the analysis which I encourage you to also explain to me, all these emails are confusing me more than anything else!
+
+Speak soon,
+
+Olivier.
