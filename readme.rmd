@@ -6,28 +6,36 @@ date: "`r Sys.Date()`"
 output: github_document
 ---
 
-```{r setup, include = FALSE}
-library(magrittr)
+```{r `session setup`, message = F, warning = F, include = F}
+library(magrittr); source("scripts/functions.r")
 
-knitr::opts_chunk$set(warning = F, message = F, echo = F)
+knitr::opts_chunk$set(echo = T, cache = F, comment = "#>", message = F, warning = F)
 ```
 
-## Correlation matrices
 
-Hi Pawel, no file size exceeds 6gb which I thought would be ok as most notebooks run with RAM >= 8gb nowadays. One solution is to read sequetially, only loading one chunk of a particular file at a time in memory. The matrices are 24x24 (24 commodities) so ideally you would choose chunk size = 24x rows. Each file is organised as follow:  
+## Distances
 
-```{r correlations}
+Hi Devraj & Pawel,
 
-# readr::read_csv(file = "results/correlations/1-year chunks - CHP.csv", n_max = 24L) %>% 
-#   kableExtra::kable() %>% kableExtra::kable_styling() %>%
-#   kableExtra::scroll_box(width = "100%", height = "400px")
+It seems the distance functions in the R TDA package calculate distances over a grid of points:
+```{r distances}
+set.seed(4321L); by <- 0.05
 
-readr::read_csv(file = "results/correlations/1-year chunks - CHP.csv", n_max = 24L)
+matrix <- matrix(runif(25L, 0L, 1L), nrow = 5L, ncol = 5L)
+grid <- expand.grid(seq(0L, 1L, by = by), seq(0L, 1L, by = by), 
+                    seq(0L, 1L, by = by), seq(0L, 1L, by = by), 
+                    seq(0L, 1L, by = by))
+
+distance <- TDA::distFct(X = matrix, Grid = grid)
+
+head(distance)
 ```
 
-  
-  
-Another solution, not incompatible with the one above actually, would be to explain me in plain english what you do with each matrix so I could perform the task myself which I would happily do. Meanwhile you could focus on the other part of the analysis which I encourage you to also explain to me, all these emails are confusing me more than anything else!
+This approach is a rather different from the one we take in the paper. The most convenient way to proceed at this stage I guess is to go for the individual .csv files as we discussed; you can find them here:  
+[correlation matrices](https://www.dropbox.com/s/zrwt773wjn0bukc/matrices.tar.xz?dl=0).  
+
+
+Regarding clustering, are we agnostic on the algorithmic approach or do you have a particular method in mind?
 
 Speak soon,
 
